@@ -95,6 +95,7 @@ for i in range(1, cols * rows + 1):
     plt.imshow(image.squeeze(), cmap='gray')
 
 plt.show()
+plt.savefig('sample')
 plt.close()
 
 #convert to numpy for MLP training (flatten images)
