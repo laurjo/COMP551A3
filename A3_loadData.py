@@ -84,19 +84,22 @@ labels_map = {
 }
 
 figure = plt.figure(figsize=(10, 10))
-cols, rows = 3, 3
+cols, rows = 5, 2
 
 for i in range(1, cols * rows + 1):
     sample_idx = torch.randint(len(train_dataset), size=(1,)).item()
     image, label = train_dataset[sample_idx]
+    while label != i-1:
+        sample_idx = torch.randint(len(train_dataset), size=(1,)).item()
+        image, label = train_dataset[sample_idx]
     figure.add_subplot(rows, cols, i)
-    plt.title(labels_map[label])
+    plt.title("Class " + str(label) + ": " + labels_map[label])
     plt.axis('off')
     plt.imshow(image.squeeze(), cmap='gray')
 
-plt.show()
-plt.savefig('sample')
-plt.close()
+#plt.show()
+#plt.savefig('sample')
+#plt.close()
 
 #convert to numpy for MLP training (flatten images)
 def dataset_to_numpy(dataset):
@@ -119,6 +122,28 @@ X_train, y_train = dataset_to_numpy(train_dataset)
 X_val, y_val = dataset_to_numpy(val_dataset)
 X_test, y_test = dataset_to_numpy(test_dataset)
 
+
+#plot bar chart with class distributions of training data
+#average class distributions over five validating/training splits
+y5 = []
+for i in range(5):
+    train_dataset, val_dataset = random_split(full_train_dataset, [train_size, val_size])
+    X_train, y_train = dataset_to_numpy(train_dataset)
+    y5 = np.concatenate((y5, y_train))
+
+unique, counts = np.unique(y5, return_counts=True)
+unique_pct = []
+for elem in counts:
+    unique_pct.append(elem/len(y5)*100)
+
+classes = ['T-shirt','Trouser','Pullover','Dress','Coat','Sandal','Shirt','Sneaker','Bag','Ankle Boot']
+fig, ax = plt.subplots()
+vbars = ax.bar(unique, unique_pct, align='center')
+ax.set_xticks(unique, labels = classes)
+ax.set_ylabel('% of Training Data')
+ax.bar_label(vbars, fmt='%.2f')
+plt.show()
+
 #save numpy arrays for later use
 np.save('X_train.npy', X_train)
 np.save('y_train.npy', y_train)
@@ -126,3 +151,4 @@ np.save('X_val.npy', X_val)
 np.save('y_val.npy', y_val)
 np.save('X_test.npy', X_test)
 np.save('y_test.npy', y_test)
+
