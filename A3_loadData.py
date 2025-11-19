@@ -60,12 +60,13 @@ test_dataset = datasets.FashionMNIST(
 )
 
 #split training data into train and validation
-train_size = 50000
-val_size = 10000
-train_dataset, val_dataset = random_split(full_train_dataset, [train_size, val_size])
+#train_size = 50000
+#val_size = 10000
+#train_dataset, val_dataset = random_split(full_train_dataset, [train_size, val_size])
+train_dataset = full_train_dataset
 
 print(f"Train set size: {len(train_dataset)}")
-print(f"Val set size: {len(val_dataset)}")
+#print(f"Val set size: {len(val_dataset)}")
 print(f"Test set size: {len(test_dataset)}")
 
 #TODO make bar chart of class distributions
@@ -119,22 +120,15 @@ def dataset_to_numpy(dataset):
     return X, y
 
 X_train, y_train = dataset_to_numpy(train_dataset)
-X_val, y_val = dataset_to_numpy(val_dataset)
+#X_val, y_val = dataset_to_numpy(val_dataset)
 X_test, y_test = dataset_to_numpy(test_dataset)
 
 
 #plot bar chart with class distributions of training data
-#average class distributions over five validating/training splits
-y5 = []
-for i in range(5):
-    train_dataset, val_dataset = random_split(full_train_dataset, [train_size, val_size])
-    X_train, y_train = dataset_to_numpy(train_dataset)
-    y5 = np.concatenate((y5, y_train))
-
-unique, counts = np.unique(y5, return_counts=True)
+unique, counts = np.unique(y_train, return_counts=True)
 unique_pct = []
 for elem in counts:
-    unique_pct.append(elem/len(y5)*100)
+    unique_pct.append(elem/len(y_train)*100)
 
 classes = ['T-shirt','Trouser','Pullover','Dress','Coat','Sandal','Shirt','Sneaker','Bag','Ankle Boot']
 fig, ax = plt.subplots()
@@ -144,11 +138,25 @@ ax.set_ylabel('% of Training Data')
 ax.bar_label(vbars, fmt='%.2f')
 plt.show()
 
+#plot bar chart with class distributions of training data
+unique, counts = np.unique(y_test, return_counts=True)
+unique_pct = []
+for elem in counts:
+    unique_pct.append(elem/len(y_test)*100)
+
+classes = ['T-shirt','Trouser','Pullover','Dress','Coat','Sandal','Shirt','Sneaker','Bag','Ankle Boot']
+fig, ax = plt.subplots()
+vbars = ax.bar(unique, unique_pct, align='center')
+ax.set_xticks(unique, labels = classes)
+ax.set_ylabel('% of Testing Data')
+ax.bar_label(vbars, fmt='%.2f')
+plt.show()
+
 #save numpy arrays for later use
 np.save('X_train.npy', X_train)
 np.save('y_train.npy', y_train)
-np.save('X_val.npy', X_val)
-np.save('y_val.npy', y_val)
+#np.save('X_val.npy', X_val)
+#np.save('y_val.npy', y_val)
 np.save('X_test.npy', X_test)
 np.save('y_test.npy', y_test)
 
