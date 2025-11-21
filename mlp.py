@@ -55,7 +55,7 @@ def cross_entropy_loss(y_pred, y_true):
     return loss
 
 class MLP:
-    def __init__(self, h, depth, m, gamma=0.01):
+    def __init__(self, h, depth, m, gamma=0.01, l1 = False, l2 = False):
         """
         h: activation function
         depth: number of hidden layers
@@ -66,6 +66,8 @@ class MLP:
         self.depth = depth
         self.m = m
         self.gamma = gamma
+        self.add_l1 = l1
+        self.add_l2 = l2
         
         #determine activation gradient function
         if h == relu:
@@ -144,7 +146,7 @@ class MLP:
         
         return y_pred, cache
     
-    def backward(self, y_pred, y_true, cache):
+    def backward(self, y_pred, y_true, cache, reg_coeff):
         """
         Backward pass to compute gradients
         y_pred: (batch_size, 10)
@@ -169,7 +171,13 @@ class MLP:
             dw = np.dot(a_prev.T, dz)
             db = np.sum(dz, axis=0, keepdims=True)
             
-            grads_w.insert(0, dw)
+            if self.add_l2:
+                grads_w.insert(0, reg_coeff * dw)
+            elif self.add_l1:
+                grads_w.insert(0, reg_coeff * np.sign(dw))
+            else:
+                grads_w.insert(0, dw)
+
             grads_b.insert(0, db)
             
             #gradient of previous layer activation
@@ -178,10 +186,12 @@ class MLP:
                 #gradient through activation function
                 z_prev = cache['pre_activations'][i - 1]
                 dz = da * self.h_grad(z_prev)
+
+            
         
         return grads_w, grads_b
 
-    def fit(self, X_train, y_train, X_test, y_test, learning_rate=0.01, epochs=100, batch_size=64):
+    def fit(self, X_train, y_train, X_test, y_test, learning_rate=0.01, epochs=100, batch_size=64, reg_coeff=0):
         """
         Train the MLP using mini-batch gradient descent
         """
@@ -216,7 +226,7 @@ class MLP:
                 epoch_loss += loss
 
                 #backward pass
-                grads_w, grads_b = self.backward(y_pred, y_batch, cache)
+                grads_w, grads_b = self.backward(y_pred, y_batch, cache, reg_coeff)
 
                 #update weights and biases
                 for i in range(len(self.weights)):
@@ -271,11 +281,10 @@ def cross_validation_split(n, n_folds=5):
         #but retains enough state information to enable function to resume where it is left off
         yield tr_inds, val_inds
 
-def kfold_cross_val(x , y, n_folds , model, lr, n_epoches):
+def kfold_cross_val(x , y, n_folds , model, lr, n_epoches, reg_coeff):
     score_val = np.zeros(n_folds)
     for f, (tr, val) in enumerate(cross_validation_split(x.shape[0], n_folds)):
-        train_losses, train_accuracies, test_accuracies = model.fit(x[tr], y[tr], x[val], y[val], learning_rate=lr, epochs=n_epoches)
+        train_losses, train_accuracies, test_accuracies = model.fit(x[tr], y[tr], x[val], y[val], learning_rate=lr, epochs=n_epoches, reg_coeff=reg_coeff)
         score_val[f] = model.evaluate_acc(y[val], model.predict(x[val]))
     return score_val, score_val.mean()
-
 
