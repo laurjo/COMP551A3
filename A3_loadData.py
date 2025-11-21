@@ -69,38 +69,6 @@ print(f"Train set size: {len(train_dataset)}")
 #print(f"Val set size: {len(val_dataset)}")
 print(f"Test set size: {len(test_dataset)}")
 
-#TODO make bar chart of class distributions
-#visualize some samples
-labels_map = {
-    0: 'T-shirt',
-    1: 'Trouser',
-    2: 'Pullover',
-    3: 'Dress',
-    4: 'Coat',
-    5: 'Sandal',
-    6: 'Shirt',
-    7: 'Sneaker',
-    8: 'Bag',
-    9: 'Ankle Boot',
-}
-
-figure = plt.figure(figsize=(10, 10))
-cols, rows = 5, 2
-
-for i in range(1, cols * rows + 1):
-    sample_idx = torch.randint(len(train_dataset), size=(1,)).item()
-    image, label = train_dataset[sample_idx]
-    while label != i-1:
-        sample_idx = torch.randint(len(train_dataset), size=(1,)).item()
-        image, label = train_dataset[sample_idx]
-    figure.add_subplot(rows, cols, i)
-    plt.title("Class " + str(label) + ": " + labels_map[label])
-    plt.axis('off')
-    plt.imshow(image.squeeze(), cmap='gray')
-
-#plt.show()
-#plt.savefig('sample')
-#plt.close()
 
 #convert to numpy for MLP training (flatten images)
 def dataset_to_numpy(dataset):
@@ -124,33 +92,7 @@ X_train, y_train = dataset_to_numpy(train_dataset)
 X_test, y_test = dataset_to_numpy(test_dataset)
 
 
-#plot bar chart with class distributions of training data
-unique, counts = np.unique(y_train, return_counts=True)
-unique_pct = []
-for elem in counts:
-    unique_pct.append(elem/len(y_train)*100)
 
-classes = ['T-shirt','Trouser','Pullover','Dress','Coat','Sandal','Shirt','Sneaker','Bag','Ankle Boot']
-fig, ax = plt.subplots()
-vbars = ax.bar(unique, unique_pct, align='center')
-ax.set_xticks(unique, labels = classes)
-ax.set_ylabel('% of Training Data')
-ax.bar_label(vbars, fmt='%.2f')
-plt.show()
-
-#plot bar chart with class distributions of training data
-unique, counts = np.unique(y_test, return_counts=True)
-unique_pct = []
-for elem in counts:
-    unique_pct.append(elem/len(y_test)*100)
-
-classes = ['T-shirt','Trouser','Pullover','Dress','Coat','Sandal','Shirt','Sneaker','Bag','Ankle Boot']
-fig, ax = plt.subplots()
-vbars = ax.bar(unique, unique_pct, align='center')
-ax.set_xticks(unique, labels = classes)
-ax.set_ylabel('% of Testing Data')
-ax.bar_label(vbars, fmt='%.2f')
-plt.show()
 
 #save numpy arrays for later use
 np.save('X_train.npy', X_train)

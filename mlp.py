@@ -1,6 +1,6 @@
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
+
 
 # Load the arrays
 X_train = np.load('X_train.npy')
