@@ -172,9 +172,9 @@ class MLP:
             db = np.sum(dz, axis=0, keepdims=True)
             
             if self.add_l2:
-                grads_w.insert(0, reg_coeff * dw)
+                grads_w.insert(0, dw + reg_coeff * self.weights[i])
             elif self.add_l1:
-                grads_w.insert(0, reg_coeff * np.sign(dw))
+                grads_w.insert(0, reg_coeff * np.sign(self.weights[i]))
             else:
                 grads_w.insert(0, dw)
 
