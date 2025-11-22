@@ -174,7 +174,7 @@ class MLP:
             if self.add_l2:
                 grads_w.insert(0, dw + reg_coeff * self.weights[i])
             elif self.add_l1:
-                grads_w.insert(0, reg_coeff * np.sign(self.weights[i]))
+                grads_w.insert(0, dw + reg_coeff * np.sign(self.weights[i]))
             else:
                 grads_w.insert(0, dw)
 
