@@ -97,8 +97,8 @@ X_test, y_test = dataset_to_numpy(test_dataset)
 #save numpy arrays for later use
 np.save('X_train.npy', X_train)
 np.save('y_train.npy', y_train)
-#np.save('X_val.npy', X_val)
-#np.save('y_val.npy', y_val)
 np.save('X_test.npy', X_test)
 np.save('y_test.npy', y_test)
-
+#save tensors
+torch.save(train_dataset, 'train_dataset.pt')
+torch.save(test_dataset, 'test_dataset.pt')
